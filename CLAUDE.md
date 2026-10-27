@@ -71,7 +71,8 @@ Nenhuma no momento.
 - [x] Definir comportamento, sons e controles
 - [x] Confirmar os sons (`bell` foi trocado por `service-login`)
 - [x] Criar a extensão (v0.1: `pomodoro-timer@lucasprado`, nome "Pomodoro Timer"; repositório github.com/Pradolp/Pomodoro-Timer)
-- [ ] Testar localmente
+- [x] Testar localmente
+- [x] Release v0.1 no GitHub (.zip + passo a passo no README), para instalar sem esperar o extensions.gnome.org
 - [ ] Publicar no extensions.gnome.org
 
 ## Onde paramos (27/10/2026, ~11h)
