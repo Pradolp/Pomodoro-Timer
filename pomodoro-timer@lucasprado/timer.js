@@ -20,6 +20,10 @@ export const PhaseEnd = Object.freeze({
 
 const USEC_PER_SEC = 1_000_000;
 
+// Quando o estudo termina sozinho, o descanso só começa a contar depois
+// desta espera, que é o tempo do alarme parar de tocar.
+const BREAK_START_DELAY_US = 5 * USEC_PER_SEC;
+
 export class PomodoroTimer {
     /**
      * @param {object} callbacks
@@ -59,7 +63,9 @@ export class PomodoroTimer {
         const remaining = this._paused
             ? this._remainingUs
             : this._endTime - GLib.get_monotonic_time();
-        return Math.max(0, Math.ceil(remaining / USEC_PER_SEC));
+        // Durante a espera antes do descanso, o tempo fica parado no total.
+        const clamped = Math.min(remaining, this._durationUs);
+        return Math.max(0, Math.ceil(clamped / USEC_PER_SEC));
     }
 
     /**
@@ -116,16 +122,19 @@ export class PomodoroTimer {
         this._paused = false;
         this._endTime = 0;
         this._remainingUs = 0;
+        this._durationUs = 0;
     }
 
-    _startPhase(phase) {
+    /** @param {number} [delayUs] - espera antes de a contagem começar */
+    _startPhase(phase, delayUs = 0) {
         const minutes = phase === Phase.STUDY
             ? this._config.studyMinutes
             : this._config.breakMinutes;
 
         this._phase = phase;
         this._paused = false;
-        this._remainingUs = minutes * 60 * USEC_PER_SEC;
+        this._durationUs = minutes * 60 * USEC_PER_SEC;
+        this._remainingUs = this._durationUs + delayUs;
         this._endTime = GLib.get_monotonic_time() + this._remainingUs;
         this._startTicking();
         this._onChanged();
@@ -137,7 +146,7 @@ export class PomodoroTimer {
 
         if (this._phase === Phase.STUDY && this._session < this.totalSessions) {
             event = PhaseEnd.STUDY;
-            this._startPhase(Phase.BREAK);
+            this._startPhase(Phase.BREAK, natural ? BREAK_START_DELAY_US : 0);
         } else if (this._phase === Phase.BREAK) {
             event = PhaseEnd.BREAK;
             this._session++;

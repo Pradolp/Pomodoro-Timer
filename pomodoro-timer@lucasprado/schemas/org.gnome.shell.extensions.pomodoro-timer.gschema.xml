@@ -27,13 +27,19 @@
     </key>
 
     <key name="break-end-sound" type="s">
-      <default>'bell'</default>
+      <default>'service-login'</default>
       <summary>Som tocado no fim do descanso (tema de sons freedesktop)</summary>
     </key>
 
     <key name="finished-sound" type="s">
       <default>'complete'</default>
       <summary>Som tocado ao fim da última sessão (tema de sons freedesktop)</summary>
+    </key>
+
+    <key name="start-requested" type="b">
+      <default>false</default>
+      <summary>Pedido de início vindo da janela de configurações</summary>
+      <description>A janela de configurações liga esta chave; a extensão inicia o timer e a desliga de novo.</description>
     </key>
 
   </schema>

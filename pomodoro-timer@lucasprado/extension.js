@@ -43,8 +43,24 @@ class PomodoroIndicator extends PanelMenu.Button {
         });
 
         this._buildMenu();
-        this._settings.connectObject('changed', () => this._sync(), this);
+        // Um pedido que ficou ligado de antes (extensão desativada) não vale.
+        this._settings.set_boolean('start-requested', false);
+        this._settings.connectObject(
+            'changed', () => this._sync(),
+            'changed::start-requested', () => this._onStartRequested(),
+            this);
         this._sync();
+    }
+
+    // O botão Iniciar das configurações: inicia, ou continua se estiver
+    // pausado. Com o timer já contando, não faz nada.
+    _onStartRequested() {
+        if (!this._settings.get_boolean('start-requested'))
+            return;
+        this._settings.set_boolean('start-requested', false);
+
+        if (!this._timer.running || this._timer.paused)
+            this._onPlayPause();
     }
 
     _buildMenu() {
@@ -72,7 +88,22 @@ class PomodoroIndicator extends PanelMenu.Button {
         controls.add_child(this._stopButton);
 
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this.menu.addAction('Configurações', () => this._extension.openPreferences());
+        this.menu.addAction('Configurações', () => this._openPreferences());
+    }
+
+    _openPreferences() {
+        // Se a janela já está aberta, o GNOME não a traz para a frente
+        // (só registra um erro no log). Então procuramos e ativamos ela aqui.
+        const prefsWindow = global.get_window_actors()
+            .map(actor => actor.meta_window)
+            .find(win =>
+                win.get_wm_class() === 'org.gnome.Shell.Extensions' &&
+                win.get_title() === this._extension.metadata.name);
+
+        if (prefsWindow)
+            Main.activateWindow(prefsWindow);
+        else
+            this._extension.openPreferences();
     }
 
     _makeButton(iconName, accessibleName, callback) {
@@ -100,17 +131,13 @@ class PomodoroIndicator extends PanelMenu.Button {
         }
     }
 
-    _onPhaseEnd(event, {session, total}) {
-        const breakMinutes = this._settings.get_int('break-minutes');
-
+    _onPhaseEnd(event, {total}) {
         switch (event) {
         case PhaseEnd.STUDY:
-            this._alert('study-end-sound', 'Hora do descanso ☕',
-                `Sessão ${session} de ${total} concluída. Descanso de ${breakMinutes} min.`);
+            this._alert('study-end-sound', 'Bloco terminado. Descanse um pouco ☕');
             break;
         case PhaseEnd.BREAK:
-            this._alert('break-end-sound', 'De volta aos estudos 📚',
-                `Começando a sessão ${session + 1} de ${total}.`);
+            this._alert('break-end-sound', 'Descanso finalizado. Hora de pôr a mão na massa 📚');
             break;
         case PhaseEnd.FINISHED:
             this._alert('finished-sound', 'Sessões concluídas 🎉',
@@ -119,7 +146,7 @@ class PomodoroIndicator extends PanelMenu.Button {
         }
     }
 
-    _alert(soundKey, title, body) {
+    _alert(soundKey, title, body = '') {
         global.display.get_sound_player().play_from_theme(
             this._settings.get_string(soundKey), title, null);
         Main.notify(title, body);

@@ -45,15 +45,16 @@ O usuário não precisa mexer em nada durante o ciclo, mas pode parar quando qui
 - Ao clicar no timer, abre um menu com botões de símbolo: **⏸ Pausar / ▶ Continuar**, **⏭ Pular etapa** e **⏹ Parar**.
   - Usar os ícones simbólicos do próprio GNOME (`media-playback-pause-symbolic`, `media-playback-start-symbolic`, `media-skip-forward-symbolic`, `media-playback-stop-symbolic`).
 - **Pausar e continuar:** a pausa congela a contagem e o "continuar" segue de onde parou.
+- **Iniciar pelas configurações:** botão ▶ Iniciar no canto inferior direito, abaixo de "Descanso". Ele liga a chave `start-requested` do GSettings, e a extensão inicia o timer (ou continua, se estiver pausado) e desliga a chave. Com o timer já contando, não faz nada.
 
 ## Sons
 
 Usar **sons do próprio sistema** (tema de sons freedesktop), sem instalar nada e sem arquivos externos. Tocar pela API do GNOME Shell (`global.display.get_sound_player().play_from_theme(...)`), pelo nome do som.
 
-| Momento | Som sugerido |
+| Momento | Som (confirmado em 27/10/2026) |
 |---|---|
 | Fim do estudo (X) | `alarm-clock-elapsed` |
-| Fim do descanso (Y) | `bell` |
+| Fim do descanso (Y) | `service-login` |
 | Fim da última sessão | `complete` |
 
 - Para ouvir um som: `canberra-gtk-play -i <nome>`
@@ -62,13 +63,26 @@ Usar **sons do próprio sistema** (tema de sons freedesktop), sem instalar nada 
 
 ## Decisões pendentes
 
-1. Confirmar os sons sugeridos depois de ouvi-los.
+Nenhuma no momento.
 
 ## Status
 
 - [x] Pasta do projeto criada (`~/Documentos/projetos/timer`)
 - [x] Definir comportamento, sons e controles
-- [ ] Confirmar os sons
+- [x] Confirmar os sons (`bell` foi trocado por `service-login`)
 - [x] Criar a extensão (v0.1: `pomodoro-timer@lucasprado`, nome "Pomodoro Timer"; repositório github.com/Pradolp/Pomodoro-Timer)
 - [ ] Testar localmente
 - [ ] Publicar no extensions.gnome.org
+
+## Onde paramos (27/10/2026, ~11h)
+
+- A extensão foi instalada com `./scripts/install.sh`, que cria um link em `~/.local/share/gnome-shell/extensions/pomodoro-timer@lucasprado` apontando para a pasta do projeto.
+- O primeiro `gnome-extensions enable` respondeu "não existe" porque a instalação aconteceu depois do login. O GNOME só procura extensões novas quando a sessão começa.
+- Próximo passo: o usuário encerra a sessão, entra de novo e roda `gnome-extensions enable pomodoro-timer@lucasprado`.
+- Ao voltar, perguntar se o timer apareceu na barra superior e seguir com o teste:
+  - Usar tempos curtos nas preferências (`gnome-extensions prefs pomodoro-timer@lucasprado`), por exemplo 3 sessões de 1 min de estudo e 1 min de descanso.
+  - Conferir o texto na barra (📚/☕ e contagem das sessões) e que não há descanso depois da última sessão.
+  - Conferir que no fim do ciclo toca o som `complete` e o timer volta ao início.
+  - Conferir pausar/continuar, pular etapa, parar, os sons e as notificações.
+  - Para ver erros: `journalctl -f -o cat /usr/bin/gnome-shell`.
+- Depois do teste: confirmar os sons, corrigir o que aparecer e gerar o pacote (`./scripts/pack.sh`) para publicar.
