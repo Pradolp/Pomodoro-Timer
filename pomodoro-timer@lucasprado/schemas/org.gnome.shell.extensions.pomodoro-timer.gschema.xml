@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.pomodoro-timer"
+          path="/org/gnome/shell/extensions/pomodoro-timer/">
+
+    <key name="sessions" type="i">
+      <range min="1" max="20"/>
+      <default>3</default>
+      <summary>Número de sessões de estudo</summary>
+    </key>
+
+    <key name="study-minutes" type="i">
+      <range min="1" max="240"/>
+      <default>50</default>
+      <summary>Duração do estudo, em minutos</summary>
+    </key>
+
+    <key name="break-minutes" type="i">
+      <range min="1" max="120"/>
+      <default>10</default>
+      <summary>Duração do descanso, em minutos</summary>
+    </key>
+
+    <key name="study-end-sound" type="s">
+      <default>'alarm-clock-elapsed'</default>
+      <summary>Som tocado no fim do estudo (tema de sons freedesktop)</summary>
+    </key>
+
+    <key name="break-end-sound" type="s">
+      <default>'bell'</default>
+      <summary>Som tocado no fim do descanso (tema de sons freedesktop)</summary>
+    </key>
+
+    <key name="finished-sound" type="s">
+      <default>'complete'</default>
+      <summary>Som tocado ao fim da última sessão (tema de sons freedesktop)</summary>
+    </key>
+
+  </schema>
+</schemalist>

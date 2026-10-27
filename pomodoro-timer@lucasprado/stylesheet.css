@@ -1,0 +1,17 @@
+/* Números com largura fixa, para o texto não "tremer" a cada segundo. */
+.pomodoro-label {
+  font-feature-settings: "tnum";
+}
+
+.pomodoro-status {
+  font-weight: bold;
+}
+
+.pomodoro-controls {
+  spacing: 12px;
+  padding: 4px 0;
+}
+
+.pomodoro-button {
+  padding: 10px;
+}

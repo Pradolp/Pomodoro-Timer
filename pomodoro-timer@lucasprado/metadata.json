@@ -1,0 +1,10 @@
+{
+  "uuid": "pomodoro-timer@lucasprado",
+  "name": "Pomodoro Timer",
+  "description": "Timer Pomodoro na barra superior: sessões de estudo e descanso em ciclo automático, com som e notificação ao fim de cada etapa.",
+  "shell-version": ["50"],
+  "session-modes": ["user", "unlock-dialog"],
+  "settings-schema": "org.gnome.shell.extensions.pomodoro-timer",
+  "url": "https://github.com/Pradolp/Pomodoro-Timer",
+  "version-name": "0.1"
+}
